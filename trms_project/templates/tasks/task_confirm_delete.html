@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_title %}Delete Task{% endblock %}
+{% block page_subtitle %}Remove the selected task entry from the daily tracker{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <h3 class="section-title mb-2">Delete task for {{ task.trainer.name }}?</h3>
+        <p class="section-subtitle mb-4">{{ task.date }} | {{ task.get_task_type_display }} | {{ task.hours }} hours</p>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger">Confirm Delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

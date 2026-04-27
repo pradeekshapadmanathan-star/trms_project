@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block page_title %}Circles{% endblock %}
+{% block page_subtitle %}Assign trainers and managers within delivery groups{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Circles</h3>
+                <p class="section-subtitle mb-0">Operational groups with management ownership</p>
+            </div>
+            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                <a href="{% url 'accounts:create_circle' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus me-2"></i>Create Circle
+                </a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead><tr><th>Name</th><th>Manager</th>{% if request.user.role == 'admin' or request.user.role == 'manager' %}<th class="text-end">Action</th>{% endif %}</tr></thead>
+                <tbody>
+                    {% for circle in circles %}
+                        <tr>
+                            <td>{{ circle.name }}</td>
+                            <td>{{ circle.manager.name|default:"-" }}</td>
+                            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                                <td class="text-end"><a href="{% url 'accounts:delete_circle' circle.id %}" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="{% if request.user.role == 'admin' or request.user.role == 'manager' %}3{% else %}2{% endif %}" class="text-center text-muted py-4">No circles found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

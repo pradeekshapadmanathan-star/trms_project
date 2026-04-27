@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block page_title %}Batches{% endblock %}
+{% block page_subtitle %}Track active programs, assigned trainers, and delivery windows{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Batches</h3>
+                <p class="section-subtitle mb-0">Program schedule, course mapping, and trainer assignment</p>
+            </div>
+            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                <a href="{% url 'tasks:create_batch' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus me-2"></i>Create Batch
+                </a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead><tr><th>Name</th><th>Course</th><th>Dates</th><th>Trainer</th>{% if request.user.role == 'admin' or request.user.role == 'manager' %}<th class="text-end">Action</th>{% endif %}</tr></thead>
+                <tbody>
+                    {% for batch in batches %}
+                        <tr>
+                            <td>{{ batch.name }}</td>
+                            <td>{{ batch.course }}</td>
+                            <td>{{ batch.start_date }} to {{ batch.end_date }}</td>
+                            <td>{{ batch.trainer.name }}</td>
+                            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                                <td class="text-end"><a href="{% url 'tasks:delete_batch' batch.id %}" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}<tr><td colspan="{% if request.user.role == 'admin' or request.user.role == 'manager' %}5{% else %}4{% endif %}" class="text-center text-muted py-4">No batches available</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

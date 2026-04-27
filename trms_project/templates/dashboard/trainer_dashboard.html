@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block page_title %}Trainer Dashboard{% endblock %}
+{% block page_subtitle %}Track assignments, occupancy, uploads, and delivery milestones{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-primary-subtle text-primary"><i class="fa-solid fa-gauge-high"></i></div>
+            <div><div class="metric-label">Occupancy</div><div class="metric-value">{{ occupancy.occupancy_percent }}%</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-success-subtle text-success"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div><div class="metric-label">Remaining Hours</div><div class="metric-value">{{ occupancy.remaining_hours }}</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-info-subtle text-info"><i class="fa-solid fa-folder-open"></i></div>
+            <div><div class="metric-label">Recent Uploads</div><div class="metric-value">{{ uploads|length }}</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Assigned Tasks</h3>
+                        <p class="section-subtitle mb-0">Latest tracker entries and approval states</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table app-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Task</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                                <tr>
+                                    <td>{{ task.date }}</td>
+                                    <td>{{ task.get_task_type_display }}</td>
+                                    <td><span class="badge status-badge status-{{ task.status }}">{{ task.get_status_display }}</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">No tasks yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Recent Uploads</h3>
+                        <p class="section-subtitle mb-0">Quick access to submitted documents</p>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for upload in uploads %}
+                        <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom">
+                            <div>
+                                <div class="fw-semibold">{{ upload.file.name }}</div>
+                                <div class="small text-muted">{{ upload.uploaded_at }}</div>
+                            </div>
+                            <a href="{{ upload.file.url }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fa-solid fa-download me-2"></i>Open
+                            </a>
+                        </div>
+                    {% empty %}
+                        <div class="text-muted py-4">No uploads yet</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        {% include "tasks/_calendar_card.html" %}
+    </div>
+</div>
+{% endblock %}

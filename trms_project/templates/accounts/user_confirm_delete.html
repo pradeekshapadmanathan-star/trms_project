@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_title %}Delete User{% endblock %}
+{% block page_subtitle %}Remove user access from the TRMS workspace{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <h3 class="section-title mb-2">Delete {{ target_user.name }}?</h3>
+        <p class="section-subtitle mb-4">This action removes the selected user from the system.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger">Confirm Delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

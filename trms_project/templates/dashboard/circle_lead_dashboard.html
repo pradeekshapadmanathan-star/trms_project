@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block page_title %}Circle Lead Dashboard{% endblock %}
+{% block page_subtitle %}Only your assigned circles, batches, and trainer activity{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-primary-subtle text-primary"><i class="fa-regular fa-circle-dot"></i></div>
+            <div><div class="metric-label">Circles</div><div class="metric-value">{{ circle_count }}</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-info-subtle text-info"><i class="fa-solid fa-layer-group"></i></div>
+            <div><div class="metric-label">Batches</div><div class="metric-value">{{ batch_count }}</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-success-subtle text-success"><i class="fa-solid fa-user-group"></i></div>
+            <div><div class="metric-label">Trainers</div><div class="metric-value">{{ trainer_count }}</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Task Status Snapshot</h3>
+                        <p class="section-subtitle mb-0">Only for your assigned circles</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table app-table align-middle mb-0">
+                        <thead><tr><th>Status</th><th>Total</th></tr></thead>
+                        <tbody>
+                            {% for row in task_status %}
+                                <tr><td>{{ row.status|title }}</td><td>{{ row.total }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted py-4">No task data available</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Recent Batches</h3>
+                        <p class="section-subtitle mb-0">Programs mapped to your circles</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table app-table align-middle mb-0">
+                        <thead><tr><th>Name</th><th>Course</th><th>Trainer</th></tr></thead>
+                        <tbody>
+                            {% for batch in recent_batches %}
+                                <tr>
+                                    <td>{{ batch.name }}</td>
+                                    <td>{{ batch.course }}</td>
+                                    <td>{{ batch.trainer.name }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">No circle-assigned batches available</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

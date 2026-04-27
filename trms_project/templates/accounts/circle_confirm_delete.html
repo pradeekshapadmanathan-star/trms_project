@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_title %}Delete Circle{% endblock %}
+{% block page_subtitle %}Remove the selected circle from the TRMS workspace{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <h3 class="section-title mb-2">Delete {{ circle.name }}?</h3>
+        <p class="section-subtitle mb-4">This removes the circle and disconnects it from any future assignments.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger">Confirm Delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

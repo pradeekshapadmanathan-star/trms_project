@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block page_title %}Calendar{% endblock %}
+{% block page_subtitle %}Unified monthly view for tasks, holidays, and assessments{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        {% include "tasks/_calendar_card.html" %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+<nav class="sidebar-nav">
+    <a class="sidebar-link" href="{% url 'dashboard:home' %}">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Dashboard</span>
+    </a>
+    <a class="sidebar-link" href="{% url 'tasks:calendar' %}">
+        <i class="fa-regular fa-calendar"></i>
+        <span>Calendar</span>
+    </a>
+    <a class="sidebar-link" href="{% url 'tasks:task_list' %}">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Tasks</span>
+    </a>
+    {% if request.user.role == 'manager' or request.user.role == 'admin' %}
+        <a class="sidebar-link" href="{% url 'reports:report_center' %}">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Reports</span>
+        </a>
+    {% endif %}
+    <a class="sidebar-link" href="{% url 'tasks:file_list' %}">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Uploads</span>
+    </a>
+    {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+        <div class="sidebar-section-label">Administration</div>
+        <a class="sidebar-link" href="{% url 'accounts:user_list' %}">
+            <i class="fa-solid fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a class="sidebar-link" href="{% url 'accounts:circle_list' %}">
+            <i class="fa-regular fa-circle-dot"></i>
+            <span>Circles</span>
+        </a>
+        <a class="sidebar-link" href="{% url 'tasks:batch_list' %}">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Batches</span>
+        </a>
+        <a class="sidebar-link" href="{% url 'tasks:holiday_list' %}">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Holidays</span>
+        </a>
+    {% endif %}
+</nav>

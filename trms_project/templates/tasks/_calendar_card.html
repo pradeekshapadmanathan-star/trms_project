@@ -1,0 +1,51 @@
+<div class="card dashboard-card h-100">
+    <div class="card-body p-4">
+        <div class="section-heading mb-3">
+            <div>
+                <h3 class="section-title">Calendar</h3>
+                <p class="section-subtitle mb-0">Training tasks, holidays, and assessment milestones</p>
+            </div>
+        </div>
+        <div
+            id="calendar"
+            data-events='{{ calendar_events_json|default:"[]"|safe }}'
+            data-schedule-url-template="{% url 'schedule_by_date' '2000-01-01' %}"
+            data-schedule-enabled="{% if manager_schedule_enabled or request.user.role == 'manager' %}true{% else %}false{% endif %}"
+        ></div>
+    </div>
+</div>
+
+{% if manager_schedule_enabled or request.user.role == 'manager' %}
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">Schedule for Selected Date</h5>
+                    <p class="text-muted small mb-0" id="scheduleModalDate">Choose a date to view trainer schedules</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Trainer Name</th>
+                                <th>Task</th>
+                                <th>Hours</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleModalBody">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No schedules available</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

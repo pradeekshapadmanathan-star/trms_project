@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block page_title %}Holidays{% endblock %}
+{% block page_subtitle %}Maintain working day exceptions and public holiday schedules{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Holidays</h3>
+                <p class="section-subtitle mb-0">Shared date exceptions used by batches and calendar planning</p>
+            </div>
+            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                <a href="{% url 'tasks:create_holiday' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus me-2"></i>Add Holiday
+                </a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead><tr><th>Date</th><th>Description</th>{% if request.user.role == 'admin' or request.user.role == 'manager' %}<th class="text-end">Action</th>{% endif %}</tr></thead>
+                <tbody>
+                    {% for holiday in holidays %}
+                        <tr>
+                            <td>{{ holiday.date }}</td>
+                            <td>{{ holiday.description }}</td>
+                            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                                <td class="text-end"><a href="{% url 'tasks:delete_holiday' holiday.id %}" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}<tr><td colspan="{% if request.user.role == 'admin' or request.user.role == 'manager' %}3{% else %}2{% endif %}" class="text-center text-muted py-4">No holidays configured</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

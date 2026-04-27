@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block page_title %}Uploads{% endblock %}
+{% block page_subtitle %}Store and track training artifacts, decks, and supporting documents{% endblock %}
+{% block content %}
+<div class="row g-4">
+    {% if can_upload_files %}
+        <div class="col-xl-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-body p-4">
+                    <div class="section-heading mb-4">
+                        <div>
+                            <h3 class="section-title">Upload File</h3>
+                            <p class="section-subtitle mb-0">Accepted formats: PDF, PPT, PPTX, DOC, DOCX</p>
+                        </div>
+                    </div>
+                    <form method="post" action="{% url 'tasks:upload_file' %}" enctype="multipart/form-data" class="vstack gap-3">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button class="btn btn-primary">
+                            <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload File
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="{% if can_upload_files %}col-xl-8{% else %}col-12{% endif %}">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Uploaded Files</h3>
+                        <p class="section-subtitle mb-0">Latest submissions and download access</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table app-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Trainer</th>
+                                <th>File</th>
+                                <th>Uploaded At</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for upload in uploads %}
+                                <tr>
+                                    <td>{{ upload.trainer.name }}</td>
+                                    <td>{{ upload.file.name }}</td>
+                                    <td>{{ upload.uploaded_at }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ upload.file.url }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fa-solid fa-download me-2"></i>Download
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">No files uploaded</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

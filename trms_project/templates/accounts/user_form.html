@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block page_title %}Create User{% endblock %}
+{% block page_subtitle %}Provision a new user account and optional trainer profile{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Create User</h3>
+                <p class="section-subtitle mb-0">Set account details, role, and trainer information when needed</p>
+            </div>
+        </div>
+        <form method="post" class="app-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <h5 class="form-section-title">Trainer Profile</h5>
+            {{ profile_form.as_p }}
+            <button class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

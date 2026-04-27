@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block page_subtitle %}Enterprise oversight across trainers, batches, and delivery workload{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4 col-xl-3">
+        <div class="metric-card">
+            <div class="metric-icon bg-primary-subtle text-primary"><i class="fa-solid fa-user-group"></i></div>
+            <div><div class="metric-label">Total Trainers</div><div class="metric-value">{{ trainer_count }}</div></div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-3">
+        <div class="metric-card">
+            <div class="metric-icon bg-info-subtle text-info"><i class="fa-solid fa-layer-group"></i></div>
+            <div><div class="metric-label">Active Batches</div><div class="metric-value">{{ active_batch_count }}</div></div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-3">
+        <div class="metric-card">
+            <div class="metric-icon bg-success-subtle text-success"><i class="fa-solid fa-user-clock"></i></div>
+            <div><div class="metric-label">Free Trainers</div><div class="metric-value">{{ free_trainer_count }}</div></div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-3">
+        <div class="metric-card">
+            <div class="metric-icon bg-secondary-subtle text-secondary"><i class="fa-solid fa-briefcase"></i></div>
+            <div><div class="metric-label">Managers</div><div class="metric-value">{{ manager_count }}</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Trainer Workload</h3>
+                        <p class="section-subtitle mb-0">Monthly assigned hours by trainer</p>
+                    </div>
+                </div>
+                <canvas id="adminWorkloadChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Task Distribution</h3>
+                        <p class="section-subtitle mb-0">Current task mix across the platform</p>
+                    </div>
+                </div>
+                <canvas id="adminTaskDistributionChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card dashboard-card mt-4">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Recent Batches</h3>
+                <p class="section-subtitle mb-0">Latest training programs and ownership</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Trainer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for batch in recent_batches %}
+                        <tr>
+                            <td>{{ batch.name }}</td>
+                            <td>{{ batch.course }}</td>
+                            <td>{{ batch.trainer.name }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-4">No batches found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+window.renderBarChart("adminWorkloadChart", {
+    labels: [{% for item in workload_rows %}"{{ item.trainer|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    values: [{% for item in workload_rows %}{{ item.assigned_hours }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+    label: "Assigned Hours",
+});
+window.renderPieChart("adminTaskDistributionChart", {
+    labels: [{% for item in task_distribution %}"{{ item.task_type|title }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    values: [{% for item in task_distribution %}{{ item.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+});
+</script>
+{% endblock %}

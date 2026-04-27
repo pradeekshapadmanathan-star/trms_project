@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_title %}Upload File{% endblock %}
+{% block page_subtitle %}Submit a training document or work artifact{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Upload Work File</h3>
+                <p class="section-subtitle mb-0">Accepted formats: PDF, PPT, PPTX, DOC, DOCX</p>
+            </div>
+        </div>
+        <form method="post" enctype="multipart/form-data" class="app-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

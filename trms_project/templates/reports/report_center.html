@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Monthly occupancy, task mix, and export-ready trainer summaries{% endblock %}
+{% block content %}
+<div class="card dashboard-card mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h3 class="section-title mb-1">Monthly Report Center</h3>
+                <p class="section-subtitle mb-0">Filter by month, preview trainer utilization, and export files</p>
+            </div>
+            <form class="d-flex flex-wrap gap-2 align-items-center">
+                <input type="month" name="month" value="{{ month_value }}" class="form-control">
+                <button class="btn btn-primary">
+                    <i class="fa-solid fa-filter me-2"></i>Load
+                </button>
+                <a href="{% url 'reports:download_csv' %}?month={{ month_value }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-file-csv me-2"></i>CSV
+                </a>
+                <a href="{% url 'reports:download_excel' %}?month={{ month_value }}" class="btn btn-outline-success">
+                    <i class="fa-solid fa-file-excel me-2"></i>Excel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Report Preview</h3>
+                        <p class="section-subtitle mb-0">Tabular monthly summary for each trainer</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table app-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Trainer Name</th>
+                                <th>Total Hours</th>
+                                <th>Task Breakdown</th>
+                                <th>Occupancy %</th>
+                                <th>Remaining Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    <td>{{ row.trainer_name }}</td>
+                                    <td>{{ row.total_hours }}</td>
+                                    <td>{{ row.task_breakdown }}</td>
+                                    <td>{{ row.occupancy_percent }}</td>
+                                    <td>{{ row.remaining_hours }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">No report data</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Hours Overview</h3>
+                        <p class="section-subtitle mb-0">Selected month total hours by trainer</p>
+                    </div>
+                </div>
+                <canvas id="reportHoursChart" height="240"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+window.renderBarChart("reportHoursChart", {
+    labels: [{% for row in rows %}"{{ row.trainer_name|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    values: [{% for row in rows %}{{ row.total_hours }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+    label: "Total Hours",
+});
+</script>
+{% endblock %}

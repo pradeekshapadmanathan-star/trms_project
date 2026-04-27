@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block page_title %}Manager Dashboard{% endblock %}
+{% block page_subtitle %}Resource scheduling, occupancy planning, and monthly reporting{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-primary-subtle text-primary"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <div>
+                <div class="metric-label">Total Trainers</div>
+                <div class="metric-value">{{ trainer_count }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-info-subtle text-info"><i class="fa-solid fa-layer-group"></i></div>
+            <div>
+                <div class="metric-label">Active Batches</div>
+                <div class="metric-value">{{ active_batch_count }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon bg-success-subtle text-success"><i class="fa-solid fa-user-check"></i></div>
+            <div>
+                <div class="metric-label">Free Trainers</div>
+                <div class="metric-value">{{ free_trainer_count }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        {% include "tasks/_calendar_card.html" %}
+    </div>
+    <div class="col-xl-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Schedule Snapshot</h3>
+                        <p class="section-subtitle mb-0">Selected date overview</p>
+                    </div>
+                    <form class="d-flex gap-2">
+                        <input type="date" class="form-control form-control-sm" name="date" value="{{ selected_date }}">
+                        <button class="btn btn-primary btn-sm">Load</button>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table app-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Trainer Name</th>
+                                <th>Task</th>
+                                <th>Hours</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in schedule %}
+                                <tr>
+                                    <td>{{ row.trainer.name }}</td>
+                                    <td>{{ row.get_task_type_display }}</td>
+                                    <td>{{ row.hours }}</td>
+                                    <td><span class="badge status-badge status-{{ row.status }}">{{ row.get_status_display }}</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">No schedules available</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Trainer Workload</h3>
+                        <p class="section-subtitle mb-0">Monthly occupancy percentage by trainer</p>
+                    </div>
+                </div>
+                <canvas id="occupancyChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="section-heading mb-4">
+                    <div>
+                        <h3 class="section-title">Task Distribution</h3>
+                        <p class="section-subtitle mb-0">Current workload mix across task types</p>
+                    </div>
+                </div>
+                <canvas id="taskDistributionChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card dashboard-card mt-4">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Monthly Report Preview</h3>
+                <p class="section-subtitle mb-0">Quick view before export</p>
+            </div>
+            <a href="{% url 'reports:report_center' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Report Center
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Trainer</th>
+                        <th>Total Hours</th>
+                        <th>Occupancy %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report_rows %}
+                        <tr>
+                            <td>{{ row.trainer_name }}</td>
+                            <td>{{ row.total_hours }}</td>
+                            <td>{{ row.occupancy_percent }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-4">No report data</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+window.renderBarChart("occupancyChart", {
+    labels: [{% for item in occupancy_cards %}"{{ item.trainer.name|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    values: [{% for item in occupancy_cards %}{{ item.occupancy_percent }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+    label: "Occupancy %",
+});
+
+window.renderPieChart("taskDistributionChart", {
+    labels: [{% for item in task_distribution %}"{{ item.task_type|title }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    values: [{% for item in task_distribution %}{{ item.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+});
+</script>
+{% endblock %}

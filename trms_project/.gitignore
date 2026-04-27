@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+.env
+.venv/
+venv/
+
+# Django
+media/
+staticfiles/
+
+# Elastic Beanstalk
+.elasticbeanstalk/*
+!.elasticbeanstalk/config.yml

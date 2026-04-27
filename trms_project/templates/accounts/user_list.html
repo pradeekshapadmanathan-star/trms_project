@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block page_title %}Users{% endblock %}
+{% block page_subtitle %}Manage trainers, managers, and role-based access accounts{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Users</h3>
+                <p class="section-subtitle mb-0">Role directory for TRMS access and ownership</p>
+            </div>
+            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                <a href="{% url 'accounts:create_user' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-user-plus me-2"></i>Add User
+                </a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th class="text-end">Action</th></tr></thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.get_role_display }}</td>
+                            <td class="text-end"><a href="{% url 'accounts:delete_user' user.id %}" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-4">No users found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

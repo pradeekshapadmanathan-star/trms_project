@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block page_title %}Tasks{% endblock %}
+{% block page_subtitle %}Daily tracker entries across training, content, decks, and projects{% endblock %}
+{% block content %}
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <div class="section-heading mb-4">
+            <div>
+                <h3 class="section-title">Daily Tracker</h3>
+                <p class="section-subtitle mb-0">Central task log with approval status and hours</p>
+            </div>
+            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                <a href="{% url 'tasks:create_task' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus me-2"></i>Add Task
+                </a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead><tr><th>Trainer</th><th>Date</th><th>Task Type</th><th>Hours</th><th>Status</th>{% if request.user.role == 'admin' or request.user.role == 'manager' %}<th class="text-end">Action</th>{% endif %}</tr></thead>
+                <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <td>{{ task.trainer.name }}</td>
+                            <td>{{ task.date }}</td>
+                            <td>{{ task.get_task_type_display }}</td>
+                            <td>{{ task.hours }}</td>
+                            <td><span class="badge status-badge status-{{ task.status }}">{{ task.get_status_display }}</span></td>
+                            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                                <td class="text-end"><a href="{% url 'tasks:delete_task' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="{% if request.user.role == 'admin' or request.user.role == 'manager' %}6{% else %}5{% endif %}" class="text-center text-muted py-4">No tasks logged</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
