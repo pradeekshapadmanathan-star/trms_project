@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *.sqlite3
 *.log
+server.err
+server.out
+test.txt
 .env
 .venv/
 venv/
