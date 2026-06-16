@@ -1,10 +1,95 @@
 {% extends "base.html" %}
+{% load static %}
 {% block page_title %}Calendar{% endblock %}
-{% block page_subtitle %}Unified monthly view for tasks, holidays, and assessments{% endblock %}
+{% block page_subtitle %}Smart interactive scheduler for workforce planning{% endblock %}
 {% block content %}
-<div class="row g-4">
+<div class="row g-4 scheduler-shell">
     <div class="col-12">
-        {% include "tasks/_calendar_card.html" %}
+        <div class="card dashboard-card scheduler-card">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap gap-3 justify-content-between align-items-end mb-3">
+                    <div class="d-flex flex-wrap gap-2">
+                        <div>
+                            <label class="form-label small mb-1">Batch Filter</label>
+                            <select id="batchFilter" class="form-select form-select-sm">
+                                <option value="">All Batches</option>
+                                {% for batch in batch_filters %}
+                                <option value="{{ batch.id }}">{{ batch.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label small mb-1">Trainer Filter</label>
+                            <select id="trainerFilter" class="form-select form-select-sm">
+                                <option value="">All Trainers</option>
+                                {% for trainer in trainer_filters %}
+                                <option value="{{ trainer.id }}">{{ trainer.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% if can_export_timetable %}
+                        <div>
+                            <label class="form-label small mb-1">Export Date</label>
+                            <input id="exportDate" type="date" class="form-control form-control-sm" value="{{ today_str }}">
+                        </div>
+                        <div class="align-self-end">
+                            <a id="downloadDailyTimetable"
+                               href="{% url 'tasks:export_daily_timetable' %}?date={{ today_str }}"
+                               class="btn btn-sm btn-primary">
+                                <i class="fa-solid fa-file-excel me-1"></i>Download Daily Timetable
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="small text-muted">
+                        Hourly grid with occupancy-aware timeline blocks
+                    </div>
+                </div>
+                <div id="enterpriseScheduler"
+                     data-events-url="{% url 'tasks:scheduler_events' %}"
+                     data-day-url-template="{% url 'tasks:scheduler_day_timetable' '2000-01-01' %}"
+                     data-export-url="{% url 'tasks:export_daily_timetable' %}"></div>
+            </div>
+        </div>
     </div>
 </div>
+
+<div class="modal fade" id="schedulerDayModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content scheduler-modal">
+            <div class="modal-header border-0">
+                <div>
+                    <h5 class="modal-title">Daily Timetable</h5>
+                    <p class="small text-muted mb-0" id="schedulerModalDate">Schedule details</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Trainer</th>
+                                <th>Batch</th>
+                                <th>Task</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Occupancy</th>
+                                <th>Duration</th>
+                                <th>Circle</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedulerModalBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/tippy.js@6/dist/tippy-bundle.umd.min.js"></script>
+<script src="{% static 'js/scheduler.js' %}"></script>
 {% endblock %}

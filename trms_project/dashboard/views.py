@@ -19,6 +19,12 @@ from tasks.services import (
 )
 
 
+def is_trainer_free_today(trainer, today):
+    has_task_today = Task.objects.filter(trainer=trainer, date=today).exists()
+    has_active_batch = Batch.objects.filter(trainer=trainer, start_date__lte=today, end_date__gte=today).exists()
+    return not has_task_today and not has_active_batch
+
+
 @login_required
 def home(request):
     role = request.user.role
@@ -50,7 +56,7 @@ def home(request):
             "occupancy_cards": occupancy_cards,
             "trainer_count": trainers.count(),
             "active_batch_count": Batch.objects.filter(start_date__lte=today, end_date__gte=today).count(),
-            "free_trainer_count": sum(1 for card in occupancy_cards if card["remaining_hours"] > float(AVAILABILITY_THRESHOLD)),
+            "free_trainer_count": sum(1 for trainer in trainers if is_trainer_free_today(trainer, today)),
             "task_distribution": task_distribution,
             "report_rows": generate_monthly_report(month).to_dict(orient="records")[:5],
         }
@@ -78,16 +84,12 @@ def home(request):
         "batch_count": Batch.objects.count(),
         "task_count": Task.objects.count(),
         "active_batch_count": Batch.objects.filter(start_date__lte=today, end_date__gte=today).count(),
-        "free_trainer_count": sum(
-            1
-            for trainer in User.objects.filter(role=User.Role.TRAINER)
-            if calculate_occupancy(trainer, month.year, month.month)["remaining_hours"] > float(AVAILABILITY_THRESHOLD)
-        ),
+        "free_trainer_count": sum(1 for trainer in User.objects.filter(role=User.Role.TRAINER) if is_trainer_free_today(trainer, today)),
         "task_distribution": list(Task.objects.values("task_type").annotate(total=Count("id")).order_by("task_type")),
         "workload_rows": [
             {
                 "trainer": trainer.name,
-                "assigned_hours": calculate_occupancy(trainer, month.year, month.month)["assigned_hours"],
+                "occupancy_percent": calculate_occupancy(trainer, month.year, month.month)["occupancy_percent"],
             }
             for trainer in User.objects.filter(role=User.Role.TRAINER)
         ],

@@ -36,7 +36,7 @@
                 <div class="section-heading mb-4">
                     <div>
                         <h3 class="section-title">Trainer Workload</h3>
-                        <p class="section-subtitle mb-0">Monthly assigned hours by trainer</p>
+                        <p class="section-subtitle mb-0">Monthly occupancy percentage by trainer</p>
                     </div>
                 </div>
                 <canvas id="adminWorkloadChart" height="180"></canvas>
@@ -95,8 +95,8 @@
 <script>
 window.renderBarChart("adminWorkloadChart", {
     labels: [{% for item in workload_rows %}"{{ item.trainer|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
-    values: [{% for item in workload_rows %}{{ item.assigned_hours }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-    label: "Assigned Hours",
+    values: [{% for item in workload_rows %}{{ item.occupancy_percent }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+    label: "Occupancy %",
 });
 window.renderPieChart("adminTaskDistributionChart", {
     labels: [{% for item in task_distribution %}"{{ item.task_type|title }}"{% if not forloop.last %}, {% endif %}{% endfor %}],

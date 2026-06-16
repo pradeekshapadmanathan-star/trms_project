@@ -12,6 +12,7 @@
             data-schedule-url-template="{% url 'schedule_by_date' '2000-01-01' %}"
             data-schedule-enabled="{% if manager_schedule_enabled or request.user.role == 'manager' %}true{% else %}false{% endif %}"
         ></div>
+        <div id="calendarDebug" class="small text-muted mt-2"></div>
     </div>
 </div>
 

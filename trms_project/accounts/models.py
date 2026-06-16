@@ -12,6 +12,9 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.TRAINER)
+    circle = models.ForeignKey("Circle", on_delete=models.SET_NULL, null=True, blank=True, related_name="members")
+    skills = models.TextField(blank=True)
+    occupancy_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     REQUIRED_FIELDS = ["email", "name", "role"]
 
@@ -28,6 +31,14 @@ class Circle(models.Model):
         blank=True,
         related_name="managed_circles",
         limit_choices_to={"role": User.Role.MANAGER},
+    )
+    lead = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="led_circles",
+        limit_choices_to={"role": User.Role.CIRCLE_LEAD},
     )
 
     def __str__(self):

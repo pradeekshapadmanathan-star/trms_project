@@ -4,6 +4,11 @@ window.renderBarChart = function (canvasId, config) {
         return;
     }
 
+    const barColors = (config.values || []).map((value, index) => {
+        const palette = ["#2563eb", "#16a34a", "#f97316", "#7c3aed", "#0891b2", "#dc2626"];
+        return palette[index % palette.length];
+    });
+
     new Chart(canvas, {
         type: "bar",
         data: {
@@ -11,7 +16,7 @@ window.renderBarChart = function (canvasId, config) {
             datasets: [{
                 label: config.label || "Value",
                 data: config.values,
-                backgroundColor: "#2563eb",
+                backgroundColor: barColors,
                 borderRadius: 10,
                 maxBarThickness: 34,
             }],
@@ -42,13 +47,29 @@ window.renderPieChart = function (canvasId, config) {
         return;
     }
 
+    const taskColorMap = {
+        training: "#16a34a",
+        assessment: "#2563eb",
+        free: "#9ca3af",
+        deck: "#7c3aed",
+        project: "#f97316",
+        leave: "#facc15",
+        holiday: "#dc2626",
+        meeting: "#92400e",
+        content: "#0ea5e9",
+    };
+    const pieColors = (config.labels || []).map((label, index) => {
+        const key = String(label || "").toLowerCase().trim();
+        return taskColorMap[key] || ["#2563eb", "#60a5fa", "#22c55e", "#f97316", "#7c3aed"][index % 5];
+    });
+
     new Chart(canvas, {
         type: "pie",
         data: {
             labels: config.labels,
             datasets: [{
                 data: config.values,
-                backgroundColor: ["#2563eb", "#60a5fa", "#93c5fd", "#bfdbfe", "#1d4ed8"],
+                backgroundColor: pieColors,
                 borderColor: "#ffffff",
                 borderWidth: 3,
             }],
@@ -104,9 +125,24 @@ async function loadManagerSchedule(date, template) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const calendarEl = document.getElementById("calendar");
+    const calendarDebug = document.getElementById("calendarDebug");
 
     if (calendarEl) {
-        const events = JSON.parse(calendarEl.dataset.events || "[]");
+        let events = [];
+        try {
+            events = JSON.parse(calendarEl.dataset.events || "[]");
+        } catch (error) {
+            if (calendarDebug) {
+                calendarDebug.textContent = "Calendar data parse error. Please refresh.";
+            }
+            return;
+        }
+
+        const batchEvents = events.filter((event) => String(event.title || "").startsWith("Batch:"));
+        if (calendarDebug) {
+            calendarDebug.textContent = `Loaded events: ${events.length} | Batch events: ${batchEvents.length}`;
+        }
+
         const canOpenSchedule = calendarEl.dataset.scheduleEnabled === "true";
         const scheduleTemplate = calendarEl.dataset.scheduleUrlTemplate;
         const scheduleModalElement = document.getElementById("scheduleModal");
@@ -116,12 +152,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: "dayGridMonth",
             height: "auto",
+            eventDisplay: "block",
             headerToolbar: {
                 left: "prev,next today",
                 center: "title",
                 right: "dayGridMonth,timeGridWeek",
             },
             events,
+            eventDidMount: function (info) {
+                if (String(info.event.title || "").startsWith("Batch:")) {
+                    info.el.style.backgroundColor = "#20c997";
+                    info.el.style.borderColor = "#20c997";
+                    info.el.style.color = "#0f172a";
+                    info.el.style.fontWeight = "600";
+                }
+            },
             dateClick: async function (info) {
                 if (!canOpenSchedule || !scheduleModal) {
                     return;
